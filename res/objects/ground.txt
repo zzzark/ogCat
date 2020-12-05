@@ -1,0 +1,14 @@
+R3DINFO STATIC
+model   res/models/ground.bin
+bones   0
+anims   0
+texture res/textures/ground.jpg
+normal  0
+emm     0.0 0.0 0.0
+dif     0.8 0.8 0.7
+spe     0.1 0.1 0.1
+shi     5.0
+matrix
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+bounding 1
+-50 0 -50 100 0 100

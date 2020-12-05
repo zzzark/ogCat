@@ -1,31 +1,16 @@
 /*
-//@author:	zark
-//@time:	2020 / 5 / 31
+//@author:	zrk
+//@date:    2020 / 5 / 31
 //
 //
-//remarks:
-//two ways to create cube texture:
-// #1
-textureCBUE cb;
-cb.create("right", "left", "up", "down", "front", "back");
-cb.active();
-drawsomething();
-
-// #2
-textureCUBE cb;
-cb.begin();
-for(int i = 0; i < 6; i++)
-	cb.createFace(i, w, h, TT_RGB, TDT_BYTE, pointer);
-		// i = 0: right
-		// i = 1: left
-		// i = 2: up
-		// i = 3: down
-		// i = 4: front
-		// i = 5: back
-cb.end();
-cb.active();
-drawsomething();
-
+//
+//
+//@last modified date: 2020/11/11
+//+remarks:
+//+ # legacy implementation #
+//+ !!
+//+ bcz class 'skyshader' should be taken apart from class 'skybox'
+//+ !!
 */
 
 #pragma once
@@ -34,6 +19,7 @@ drawsomething();
 #include "texture2D.h"
 #include "camera.h"
 #include "textureCUBE.h"
+#include "gbuffer.h"
 namespace cat
 {
 	class skyshader final : private shader
@@ -43,6 +29,10 @@ namespace cat
 	public:
 		skyshader();
 		virtual ~skyshader();
+		
+		// ! fix !
+		void prepareBuffer(gbuffer& gbuf) const;
+		
 		inline void bind() const { shader::bind(); }
 		inline void unbind() const { shader::unbind(); }
 		void setmat4(const glm::mat4& m) const;
@@ -80,5 +70,8 @@ namespace cat
 		inline const textureCUBE& getTex() const { return _tex; }
 		void draw(const camera& cam);
 		void draw(const glm::mat4& cmb);
+
+		// ! fix !
+		const skyshader& getShader() const { return _shd; }
 	};
 }

@@ -1,7 +1,9 @@
 #include <fstream>
-#include "gmObject.h"
+#include "../game/gmObject.h"
+#include "dynamic_mesh.h"
 #include "mesh_instance.h"
 #include "R3DLoader.h"
+
 
 const char* ogm::gmObj::_s_header   = "R3DINFO";
 const char* ogm::gmObj::_s_static   = "STATIC";
@@ -56,10 +58,10 @@ static std::ostream& operator<< (std::ostream& os, const glm::mat4& m)
 
 ogm::gmObj::GMOBJ_ERR ogm::gmObj::createFromFile(const char* filepath)
 {
-	delete _inst; _inst = nullptr;
-	delete _bon ;  _bon = nullptr;
-	delete _ani ;  _ani = nullptr;  
-	_inst = new cat::meshInstance;
+	_inst = nullptr;
+	 _bon = nullptr;
+	 _ani = nullptr;
+	_inst.reset(new cat::meshInstance);
 
 	std::string sa, sb;
 	std::ifstream ifs(filepath);
@@ -76,6 +78,8 @@ ogm::gmObj::GMOBJ_ERR ogm::gmObj::createFromFile(const char* filepath)
 	if (sb == _s_static)
 		_inst->loadStaticMesh(fbin.c_str());
 	else {
+		_bon.reset(new cat::R3DBones);
+		_ani.reset(new cat::R3DAnimation);
 		_bon->load(fbon.c_str());
 		_ani->load(fani.c_str(), *_bon);
 		_inst->loadDynamicMesh(fbin.c_str(), *_bon);
@@ -87,25 +91,109 @@ ogm::gmObj::GMOBJ_ERR ogm::gmObj::createFromFile(const char* filepath)
 	// normal
 	if (read2String(ifs, sa, sb) == false) return GMOBJ_ERR::ERR_FORMAT;
 
+	// emm
 	ifs >> sa;
 	ifs >> _inst->mtl.emmisive;
 
+	// div
 	ifs >> sa;
 	ifs >> _inst->mtl.diffuse;
 
+	// spe
 	ifs >> sa;
 	ifs >> _inst->mtl.specular;
 
+	// shi
 	ifs >> sa;
 	ifs >> _inst->mtl.shininess;
 
+	// matrix
 	ifs >> sa;
 	ifs >> _inst->mdl;
+
+	// bounding
+	ifs >> sa;
+	int bounding_count = 0;
+	ifs >> bounding_count;
+	if (bounding_count != 0) {
+		glm::vec3 pos;
+		float x, y, z;
+		ifs >> pos.x >> pos.y >> pos.z;
+		ifs >> x >> y >> z;
+		collision::basicBlock::set(pos, x, y, z);
+	}
+	collision::basicBlock::update(_inst->mdl);
+
+	return GMOBJ_ERR::ERR_NO_ERROR;
 }
 
 ogm::gmObj::~gmObj()
 {
-	delete _inst; _inst = nullptr;
-	delete _bon ;  _bon = nullptr;
-	delete _ani ;  _ani = nullptr;
+	_inst = nullptr;
+	 _bon = nullptr;
+	 _ani = nullptr;
+}
+
+void ogm::gmObj::loop()
+{
+	_state = GMOBJ_DYNAMIC_STATE::ST_LOOP;
+	if (_inst && _bon && _ani && _inst->getDynamicMesh())
+		_inst->getDynamicMesh()->loop();
+}
+
+void ogm::gmObj::pause()
+{
+	_state = GMOBJ_DYNAMIC_STATE::ST_PAUSED;
+	if (_inst && _bon && _ani && _inst->getDynamicMesh())
+		_inst->getDynamicMesh()->pause();
+}
+
+void ogm::gmObj::stop()
+{
+	_state = GMOBJ_DYNAMIC_STATE::ST_STOPPED;
+	if (_inst && _bon && _ani && _inst->getDynamicMesh())
+		_inst->getDynamicMesh()->stop(*_ani);
+}
+
+void ogm::gmObj::scale(float factor)
+{
+	if (_inst) {
+		_inst->mdl[0][0] *= factor;
+		_inst->mdl[1][1] *= factor;
+		_inst->mdl[2][2] *= factor;
+		collision::basicBlock::update(_inst->mdl);
+	}
+}
+
+void ogm::gmObj::move(float dx, float dy, float dz)
+{
+	if (_inst) {
+		_inst->move(dx, dy, dz);
+		collision::basicBlock::update(_inst->mdl);
+	}
+}
+
+void ogm::gmObj::moveTo(float x, float y, float z)
+{
+	if (_inst) {
+		_inst->moveTo(x, y, z);
+		collision::basicBlock::update(_inst->mdl);
+	}
+}
+
+void ogm::gmObj::moveTo(const glm::vec3& pos)
+{
+	if (_inst) {
+		_inst->moveTo(pos);
+		collision::basicBlock::update(_inst->mdl);
+	}
+}
+
+glm::mat4& ogm::gmObj::get_model_matrix()
+{
+	static glm::mat4 identity(1);
+	if (_inst)
+		return _inst->mdl;
+	else
+		return identity;
 }

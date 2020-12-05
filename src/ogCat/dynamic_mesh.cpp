@@ -4,7 +4,7 @@
 //=====================================================================================================================//
 void cat::dynamic_mesh::load(const char* binFile, R3DBones& bones)
 {
-	R3DMesh::load(binFile);
+	R3DLoader::load(binFile);
 	if (this->getVtsCnt() <= 0) {
 		std::cout << "cat::dynamic_mesh: warning: can't load R3D file: " << binFile << std::endl;
 		return;

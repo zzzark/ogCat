@@ -6,12 +6,12 @@
 #include "frameEffect.h"
 #include "frameBuffer.h"
 #include "shadowBuffer.h"
-#include "FXAA.h"
 #include "camera.h"
 namespace cat
 {
 	class postprc
 	{
+	protected:
 		frameEffect _eff_bloom_depart;
 
 		frameEffect _eff_bloom_blur_V;
@@ -32,7 +32,9 @@ namespace cat
 		//int _loc_depth_len = -1;
 		glm::mat4 _last_mvp = glm::mat4(1);
 	public:
-		void create(gbuffer& gbf);
-		void process(gbuffer& gbf, shadowBuffer& sbf, camera& org);
+		void create(const gbuffer& gbf);
+		void process(const gbuffer& gbf, shadowBuffer& sbf, camera& org);
+		void begin() const;
+		void end() const;
 	};
 }

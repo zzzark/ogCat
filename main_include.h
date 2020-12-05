@@ -15,9 +15,7 @@
 #include "frameBuffer.h"
 #include "frameEffect.h"
 #include "terrain.h"
-#include "FXAA.h"
 #include "shadowMap2D.h"
-#include "TwoPassBlur.h"
 #include "gbuffer.h"
 #include "shadowBuffer.h"
 #include "shadowMapCUBE.h"
@@ -33,7 +31,7 @@ using namespace cat;
 //using cat::texture2D;
 //using cat::camera;
 //using cat::skybox;
-//using cat::R3DMesh;
+//using cat::R3DLoader;
 //using cat::static_mesh;
 //using cat::standardBuffer;
 //using cat::frameEffect;

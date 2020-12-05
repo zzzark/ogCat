@@ -5,10 +5,11 @@
 #pragma once
 #include "mesh.h"
 #include "R3DLoader.h"
+#include "feedback.h"
 
 namespace cat {
 
-	class dynamic_mesh : protected R3DMesh, public mesh
+	class dynamic_mesh : protected R3DLoader, public mesh
 	{
 	protected:
 		vao _secvao;

@@ -116,7 +116,6 @@ void renderer::Initialize(int width, int height, const char* caption, bool sizea
 	else {
 		glDisable(GL_MULTISAMPLE);
 	}
-
 }
 
 void renderer::Terminate()

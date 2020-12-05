@@ -14,7 +14,6 @@
 #pragma once
 #include "R3DLoader.h"
 #include "vertexBuffer.h"
-#include "feedback.h"
 #include <iostream>
 
 namespace cat
@@ -36,7 +35,7 @@ namespace cat
 
 		virtual ~mesh() = 0 {};
 	};
-	class static_mesh : protected R3DMesh, public mesh
+	class static_mesh : protected R3DLoader, public mesh
 	{
 	public:
 		// from file

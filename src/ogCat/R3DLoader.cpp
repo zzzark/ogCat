@@ -10,7 +10,7 @@ static const char R3D_HEADER_ANIMATION[] = { " ANIMATION" };
 static constexpr unsigned int HEADER_SIZE = sizeof(R3D_HEADER_STATIC) - 1;
 
 
-cat::R3DMesh::R3DMesh()
+cat::R3DLoader::R3DLoader()
 {
 	_xyz = nullptr;
 	_uv = nullptr;
@@ -21,17 +21,17 @@ cat::R3DMesh::R3DMesh()
 	_idsCnt = 0;
 	_vtsCnt = 0;
 }
-cat::R3DMesh::~R3DMesh()
+cat::R3DLoader::~R3DLoader()
 {
 	free();
 }
-void cat::R3DMesh::load(const char* filepath)
+void cat::R3DLoader::load(const char* filepath)
 {
 	free();
 	std::ifstream ifs;
 	ifs.open(filepath, std::ios::binary);
 	if (!ifs) {
-		std::cout << "R3DLoader.h(cat::R3DMesh::load(const char* filepath)) warning: can't open file: " << filepath << std::endl;
+		std::cout << "R3DLoader.h(cat::R3DLoader::load(const char* filepath)) warning: can't open file: " << filepath << std::endl;
 		return;
 	}
 	char header[HEADER_SIZE + 1] = { 0 };
@@ -40,7 +40,7 @@ void cat::R3DMesh::load(const char* filepath)
 		ifs.read((char*)&_vtsCnt, sizeof(_vtsCnt));
 		ifs.read((char*)&_idsCnt, sizeof(_idsCnt));
 		if (_vtsCnt <= 0 || _idsCnt <= 0) {
-			std::cout << "R3DLoader.h(cat::R3DMesh::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
+			std::cout << "R3DLoader.h(cat::R3DLoader::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
 			ifs.close();
 			return;
 		}
@@ -57,7 +57,7 @@ void cat::R3DMesh::load(const char* filepath)
 		*/
 		if (detP != (std::streamoff)_vtsCnt * 8 * sizeof(float) +
 					(std::streamoff)_idsCnt * sizeof(unsigned int)) {
-			std::cout << "R3DLoader.h(cat::R3DMesh::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
+			std::cout << "R3DLoader.h(cat::R3DLoader::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
 			ifs.close();
 			return;
 		}
@@ -74,7 +74,7 @@ void cat::R3DMesh::load(const char* filepath)
 		ifs.read((char*)&_vtsCnt, sizeof(_vtsCnt));
 		ifs.read((char*)&_idsCnt, sizeof(_idsCnt));
 		if (_vtsCnt <= 0 || _idsCnt <= 0) {
-			std::cout << "R3DLoader.h(cat::R3DMesh::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
+			std::cout << "R3DLoader.h(cat::R3DLoader::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
 			ifs.close();
 			return;
 		}
@@ -94,7 +94,7 @@ void cat::R3DMesh::load(const char* filepath)
 		if (detP != (std::streamoff)_vtsCnt * 12 * sizeof(float) + 
 					(std::streamoff)_vtsCnt * 4 * sizeof(unsigned int)+
 					(std::streamoff)_idsCnt * sizeof(unsigned int)) {
-			std::cout << "R3DLoader.h(cat::R3DMesh::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
+			std::cout << "R3DLoader.h(cat::R3DLoader::load(const char* filepath)) warning: R3D file corrupted: " << filepath << std::endl;
 			ifs.close();
 			return;
 		}
@@ -112,18 +112,18 @@ void cat::R3DMesh::load(const char* filepath)
 		ifs.read((char*)_ids, (size_t)_idsCnt * sizeof(unsigned int));
 	}
 	else {
-		std::cout << "R3DLoader.h(cat::R3DMesh::load(const char* filepath)) warning: not a R3D file: " << filepath << std::endl;
+		std::cout << "R3DLoader.h(cat::R3DLoader::load(const char* filepath)) warning: not a R3D file: " << filepath << std::endl;
 		ifs.close();
 		return;
 	}
 	ifs.close();
 }
 
-void cat::R3DMesh::load(const char* ptr, size_t size)
+void cat::R3DLoader::load(const char* ptr, size_t size)
 {
 }
 
-void cat::R3DMesh::free()
+void cat::R3DLoader::free()
 {
 	delete[] _xyz;	_xyz = nullptr;
 	delete[] _uv;	_uv = nullptr;
@@ -244,6 +244,10 @@ void cat::R3DBones::load(const char* filepath)
 		}
 	}
 	ifs.close();
+}
+
+void cat::R3DBones::load(const char* ptr, size_t size)
+{
 }
 
 void cat::R3DBones::update(const glm::mat4& m)
@@ -371,6 +375,10 @@ void cat::R3DAnimation::load(const char* filepath, const R3DBones& bn)
 		}
 		counter++;
 	}
+}
+
+void cat::R3DAnimation::load(const char* ptr, size_t size, const R3DBones& bn)
+{
 }
 
 

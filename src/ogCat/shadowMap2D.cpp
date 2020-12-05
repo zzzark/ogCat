@@ -128,19 +128,20 @@ static const char* ACC_SM_fs =
 "           * (dotVal * diffuse + HN * specular.xyz);                  \n"
 "}                                                                     \n"
 "                                                                      \n"
-"vec3 getXYZ(vec2 uv, float d){                                        \n"
-"    vec4 clip;                                                        \n"
-"    clip.xy = uv * 2.0 - 1.0;                                         \n"
-"    clip.z  = d  * 2.0 - 1.0;                                         \n"
-"    clip.w  = 1.0;                                                    \n"
-"    vec4 fnl = u_viewInv * clip;                                      \n"
-"    return fnl.xyz / fnl.w;                                           \n"
-"}                                                                     \n"
-"                                                                      \n"
+//"vec3 getXYZ(vec2 uv, float d){                                        \n"
+//"    vec4 clip;                                                        \n"
+//"    clip.xy = uv * 2.0 - 1.0;                                         \n"
+//"    clip.z  = d  * 2.0 - 1.0;                                         \n"
+//"    clip.w  = 1.0;                                                    \n"
+//"    vec4 fnl = u_viewInv * clip;                                      \n"
+//"    return fnl.xyz / fnl.w;                                           \n"
+//"}                                                                     \n"
+//"                                                                      \n"
 "void main()                                                           \n"
 "{                                                                     \n"
-"    float d = texture(u_pos, v_uv).x;                                 \n"
-"    vec3 pos = getXYZ(v_uv, d);                                       \n"
+//"    float d = texture(u_pos, v_uv).x;                                 \n"
+//"    vec3 pos = getXYZ(v_uv, d);                                       \n"
+"    vec3 pos = texture(u_pos, v_uv).xyz;                              \n"
 "    vec3 nml = texture(u_nml, v_uv).xyz;                              \n"
 "    color = texture(u_lit, v_uv).xyz                                  \n"
 "          + calculateShadow(pos) * calculateLight(nml) + u_ambient;   \n"
@@ -180,23 +181,33 @@ void cat::shadow2DEffect::create()
 	_loc_color      = frameEffect::shader().getlocation("u_color");
 	_loc_ambient    = frameEffect::shader().getlocation("u_ambient");
 	_loc_brightness = frameEffect::shader().getlocation("u_brightness");
-	_loc_viewInv    = frameEffect::shader().getlocation("u_viewInv");
+	//_loc_viewInv    = frameEffect::shader().getlocation("u_viewInv");
 }
 
-void cat::shadow2DEffect::applyEffect(shadowBuffer& shaBuf, const shadowMap2D& shaMap, const gbuffer& gbuf, const directionalLight& lit, const camera& litCam, const camera& orgCam)
+void cat::shadow2DEffect::setParameters(const camera& litCam, const directionalLight& lit)
 {
 	frameEffect::shader().bind();
 	frameEffect::shader().setmat4(_loc_SM_mat4, litCam.comb());
-	frameEffect::shader().setvec3(_loc_dir,  -glm::normalize(lit.direction));
-	frameEffect::shader().setvec3(_loc_view, glm::normalize(orgCam.getEye() - orgCam.getAt()));
+	frameEffect::shader().setvec3(_loc_dir, -glm::normalize(lit.direction));
+	frameEffect::shader().setmat4(_loc_SM_mat4, litCam.comb());
+	frameEffect::shader().setvec3(_loc_dir, -glm::normalize(lit.direction));
 	frameEffect::shader().setvec3(_loc_color, lit.color);
 	frameEffect::shader().setvec3(_loc_ambient, lit.ambient);
 	frameEffect::shader().setfloat(_loc_brightness, lit.intensity);
-	glm::mat4 viewInv = glm::inverse(orgCam.comb());
-	frameEffect::shader().setmat4(_loc_viewInv, viewInv);
+}
+
+
+void cat::shadow2DEffect::applyEffect(shadowBuffer& shaBuf, const shadowMap2D& shaMap, const gbuffer& gbuf, const camera& orgCam)
+{
+	frameEffect::shader().bind();
+	frameEffect::shader().setvec3(_loc_view, glm::normalize(orgCam.getEye() - orgCam.getAt()));
+
+	//glm::mat4 viewInv = glm::inverse(orgCam.comb());
+	//frameEffect::shader().setmat4(_loc_viewInv, viewInv);
 	shaBuf.begin_shadow();
 	shaBuf.getTex().active(0);
-	gbuf.dep_tex().active(1);		// pos
+	//gbuf.dep_tex().active(1);	// pos
+	gbuf.pos_tex().active(1);	// @2020/11/4: fix bugs
 	gbuf.nml_tex().active(2);
 	gbuf.dif_tex().active(3);
 	gbuf.spe_tex().active(4);

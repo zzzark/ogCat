@@ -12,6 +12,7 @@ void cat::gbuffer::create(unsigned int width, unsigned int height)
 	_gbuffer.createSpec(false, false, width, height, 4U, 16U);	// spe 3
 	_gbuffer.createSpec(false, false, width, height, 3U, 16U);	// reg 4
 	_gbuffer.createSpec(false, false, width, height, 3U, 16U);	// emm 5
+	_gbuffer.createSpec(false, false, width, height, 3U, 16U);	// pos 6
 	_gbuffer.end();
 
 	_width  = width;
@@ -26,8 +27,8 @@ const glm::vec3 cat::gbuffer::getPixel(unsigned int index, float x, float y) con
 	int xx = (int)((float)_gbuffer.getTex(1).getWidth()  * x);
 	int yy = (int)((float)_gbuffer.getTex(1).getHeight() * y);
 	float p[3];
-	CAT_CALL(glReadPixels(xx, yy, 1, 1, GL_RGB, GL_FLOAT, p));
-	_gbuffer.switchBuffers(7);
+	glReadPixels(xx, yy, 1, 1, GL_RGB, GL_FLOAT, p);
+	_gbuffer.switchBuffers(gbuffer::MAX_BUFFER_LAYER_COUNT);
 	_gbuffer.unbindForBoth();
 	return glm::vec3(p[0], p[1], p[2]);
 }
@@ -39,8 +40,8 @@ const glm::vec3 cat::gbuffer::getRecognizationPixel(float x, float y) const
 	int xx = (int)((float)_gbuffer.getTex(1).getWidth()  * x);
 	int yy = (int)((float)_gbuffer.getTex(1).getHeight() * y);
 	float p[3];
-	CAT_CALL(glReadPixels(xx, yy, 1, 1, GL_RGB, GL_FLOAT, p));
-	_gbuffer.switchBuffers(7);
+	glReadPixels(xx, yy, 1, 1, GL_RGB, GL_FLOAT, p);
+	_gbuffer.switchBuffers(gbuffer::MAX_BUFFER_LAYER_COUNT);
 	_gbuffer.unbindForBoth();
 	return glm::vec3(p[0], p[1], p[2]);
 }

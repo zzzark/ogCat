@@ -13,15 +13,15 @@ static std::ostream& operator<< (std::ostream& os, const glm::mat4& m)
 }
 void cat::static_mesh::load(const char* filepath)
 {
-	R3DMesh::load(filepath);
+	R3DLoader::load(filepath);
 	if (this->getVtsCnt() <= 0) {
 		std::cout << "cat::static_mesh: warning: can't load R3D file: " << filepath << std::endl;
 		return;
 	}
-	mesh::_xyz.create(R3DMesh::getXYZ(), this->getVtsCnt() * 3 * sizeof(float));
-	mesh:: _uv.create(R3DMesh::getUV(),  this->getVtsCnt() * 2 * sizeof(float));
-	mesh::_str.create(R3DMesh::getSTR(), this->getVtsCnt() * 3 * sizeof(float));
-	mesh:: _ib.create(R3DMesh::getIds(), this->getIdsCnt());
+	mesh::_xyz.create(R3DLoader::getXYZ(), this->getVtsCnt() * 3 * sizeof(float));
+	mesh:: _uv.create(R3DLoader::getUV(),  this->getVtsCnt() * 2 * sizeof(float));
+	mesh::_str.create(R3DLoader::getSTR(), this->getVtsCnt() * 3 * sizeof(float));
+	mesh:: _ib.create(R3DLoader::getIds(), this->getIdsCnt());
 
 	_vao.begin();
 	_vao.addBuffer(mesh::_xyz, VERTEX_TYPE::VT_FLOAT, 3, 0);
@@ -33,12 +33,12 @@ void cat::static_mesh::load(const char* filepath)
 
 void cat::static_mesh::load(const char* ptr, size_t size)
 {
-	R3DMesh::load(ptr, size);
+	R3DLoader::load(ptr, size);
 	CAT_ASSERT(this->getVtsCnt() > 0);
-	mesh::_xyz.create(R3DMesh::getXYZ(), this->getVtsCnt() * 3 * sizeof(float));
-	mesh:: _uv.create(R3DMesh::getUV(),  this->getVtsCnt() * 2 * sizeof(float));
-	mesh::_str.create(R3DMesh::getSTR(), this->getVtsCnt() * 3 * sizeof(float));
-	mesh::_ib.create(R3DMesh::getIds(), this->getIdsCnt());
+	mesh::_xyz.create(R3DLoader::getXYZ(), this->getVtsCnt() * 3 * sizeof(float));
+	mesh:: _uv.create(R3DLoader::getUV(),  this->getVtsCnt() * 2 * sizeof(float));
+	mesh::_str.create(R3DLoader::getSTR(), this->getVtsCnt() * 3 * sizeof(float));
+	mesh::_ib.create(R3DLoader::getIds(), this->getIdsCnt());
 	_vao.begin();
 	_vao.addBuffer(mesh::_xyz, VERTEX_TYPE::VT_FLOAT, 3, 0);
 	_vao.addBuffer(mesh::_uv, VERTEX_TYPE::VT_FLOAT, 2, 1);

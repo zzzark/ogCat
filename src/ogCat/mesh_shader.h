@@ -12,7 +12,23 @@
 
 namespace cat
 {
-	class mesh_shader : protected shader {
+	class meshShader : protected shader
+	{
+	public:
+		virtual void create() = 0 {};
+		virtual void draw(
+			const texture2D& tex, const material& mtl,
+			const glm::vec3& recg, const camera& cam,
+			const glm::mat4& mdl, const mesh& ms) const = 0 {};
+		
+		void bind()   const { shader::bind(); }
+		void unbind() const { shader::unbind(); }
+
+		virtual void prepareBuffer(const gbuffer& gbuf) = 0 {};
+	};
+
+	class defaultMeshShader : public meshShader
+	{
 	protected:
 		int _loc_MVP = -1;
 		int _loc_MDL = -1;
@@ -22,21 +38,11 @@ namespace cat
 		int _loc_shi = -1;
 		int _loc_reg = -1;
 	public:
-		void create();
-		void draw(const texture2D& tex, const material mtl, const glm::vec3& recg, const camera& cam, const glm::mat4& mdl, const mesh& ms) const;
-		void bind()   const { shader::bind(); }
-		void unbind() const { shader::unbind(); }
-
-		inline static void prepareBuffer(const gbuffer& gbuf) {
-			gbuf.switchBuffers(
-				gbuffer::BUFFER_LAYER::NORMAL,
-				gbuffer::BUFFER_LAYER::COLOR,
-				gbuffer::BUFFER_LAYER::DIFFUSE,
-				gbuffer::BUFFER_LAYER::SPECULAR,
-				gbuffer::BUFFER_LAYER::RECONG,
-				gbuffer::BUFFER_LAYER::EMMISIVE
-			);
-			renderer::ClearAll();
-		}
+		void create() override;
+		void draw(
+			const texture2D& tex, const material& mtl,
+			const glm::vec3& recg, const camera& cam,
+			const glm::mat4& mdl, const mesh& ms) const override;
+		void prepareBuffer(const gbuffer& gbuf) override;
 	};
 };

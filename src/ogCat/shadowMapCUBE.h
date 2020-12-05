@@ -12,7 +12,7 @@
 
 namespace cat
 {
-	class shadowMapCUBE
+	class shadowMapCUBE final
 	{
 		textureCUBE _tex;
 		frameBuffer _dep;
@@ -26,11 +26,13 @@ namespace cat
 		~shadowMapCUBE();
 		void create(unsigned int width, unsigned int height);
 
-		void begin(const glm::vec3& point, float zNear, float zFar);
-		void beginPURE(const glm::vec3& lightPos, float zNear, float zFar);
+		void begin();
+		void beginPURE();
 		void draw(const glm::mat4& world, const mesh& ms);
 		void end();
 		void endPURE();
+
+		void setParameters(const glm::vec3& lightPos, float zNear, float zFar);
 		
 		inline const textureCUBE& getDep() const { return _tex; }
 		inline void release() {
@@ -45,6 +47,7 @@ namespace cat
 		int _loc_color;
 		int _loc_ambient;
 		int _loc_brightness;
+		int _loc_max_brightness;
 		int _loc_point;
 		int _loc_viewInv;
 		void create(const char*) {}
@@ -53,9 +56,10 @@ namespace cat
 	public:
 		shadowCUBEEffect();
 		void create();
-		void applyEffect(shadowBuffer& shaBuf, const shadowMapCUBE& shaMap, const gbuffer& gbuf, const pointLight& lit, const camera& orgCam);
+		void applyEffect(shadowBuffer& shaBuf, const shadowMapCUBE& shaMap, const gbuffer& gbuf, const camera& orgCam);
 		void setBias(float bias) const;
 		void setFarPlane(float zFar) const;
 		void setMaxBrightness(float val) const;
+		void setLightParameters(const pointLight& lit);
 	};
 }

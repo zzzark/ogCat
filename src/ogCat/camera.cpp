@@ -63,33 +63,3 @@ const glm::mat4& cat::camera::walk(const glm::vec3& pos)
 	_combined = _proj * _view;
 	return _view;
 }
-
-// dx == dy != dz
-const glm::mat4& cat::camera::delta(float dx, float dy, float dz, float dphi, float dtheta)
-{
-	glm::vec3 dir = _at - _eye;
-	if (dx || dz) {
-		glm::vec3 zdir(dir.x, 0, dir.z);
-		glm::vec3 xdir(-dir.z, 0, dir.x);
-		glm::vec3 xyz = dz * glm::normalize(zdir) + dx * glm::normalize(xdir);
-		_at += xyz;
-		_eye += xyz;
-	}
-	if (dy) {
-		_at.y += dy;
-		_eye.y += dy;
-	}
-	if (dphi || dtheta) {
-		glm::vec4 fnl;
-		fnl = glm::rotate(glm::mat4(1.0f), dphi,   glm::normalize(glm::vec3(-dir.z, 0, dir.x))) * glm::vec4(dir, 0);
-		fnl = glm::rotate(glm::mat4(1.0f), dtheta, glm::normalize(glm::vec3(     0, 1,     0))) * fnl;
-		glm::vec3 fnl3(fnl.x, fnl.y, fnl.z);
-		float dt = dot(fnl3, glm::vec3(0, 1, 0));
-		if( dt * dt <= dot(fnl3, fnl3) * 0.9f )
-			_at = glm::vec3(fnl.x, fnl.y, fnl.z) + _eye;
-			//_eye = _at - glm::vec3(fnl.x, fnl.y, fnl.z);
-	}
-	_view = glm::camera(_eye, _at);
-	_combined = _proj * _view;
-	return _view;
-}

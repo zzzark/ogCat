@@ -147,17 +147,17 @@ void cat::textureCUBE::end()
 
 void cat::textureCUBE::active(unsigned int slot) const
 {
-	CAT_CALL(glBindTextureUnit(slot, _id));
+	glBindTextureUnit(slot, _id);
 }
 
 void cat::textureCUBE::bind() const
 {
-	CAT_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, _id));
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _id);
 }
 
 void cat::textureCUBE::unbind() const
 {
-	CAT_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void cat::textureCUBE::release()

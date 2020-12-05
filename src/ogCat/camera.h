@@ -28,6 +28,5 @@ namespace cat
 		const glm::mat4& walk(const glm::vec3& pos);
 		inline const glm::vec3& getEye() const { return _eye; }
 		inline const glm::vec3& getAt() const { return _at; }
-		const glm::mat4& delta(float dx, float dy, float dz, float dphi, float dtheta);
 	};
 }

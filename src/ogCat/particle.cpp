@@ -2,13 +2,13 @@
 #include "dbg.h"
 static const char* spk_vs =
 "#version 450								\n"
-"layout (location = 0) in vec3 v_pos;		\n"
-"layout (location = 1) in float intensity;	\n"
-"out float v_intn;                          \n"
+"layout (location = 0) in vec3  in_pos;		\n"
+"layout (location = 1) in float in_int;	    \n"
+"out float out_int;                         \n"
 "void main()								\n"
 "{											\n"
-"	gl_Position = vec4(v_pos, 1.0f);		\n"
-"   v_intn = intensity;                     \n"
+"	gl_Position = vec4(in_pos, 1.0f);		\n"
+"   out_int = in_int;                       \n"
 "}											\n"
 ;
 static const char* spk_gs =
@@ -19,14 +19,14 @@ static const char* spk_gs =
 "uniform vec3 u_right;                      \n"
 "uniform vec3 u_up;                         \n"
 "uniform float u_size = 1.0f;               \n"
-"in float v_intn[];                         \n"
+"in float out_int[];                        \n"
 "out float v_int;                           \n"
 "											\n"
 "out vec2 v_uv;	        					\n"
 "uniform mat4 u_MVP;						\n"
 "void main()								\n"
 "{											\n"
-"   v_int = v_intn[0];                      \n"
+"   v_int = out_int[0];                     \n"
 "	vec3 pos = gl_in[0].gl_Position.xyz;	\n"
 "											\n"
 "	pos -= (u_right * 0.5f * u_size);		\n"
@@ -66,12 +66,12 @@ static const char* spk_fs =
 "            * v_int * u_int;                      \n"
 "}											       \n"
 ;
-void cat::sparks::setSize(float sz)
+void cat::sparks::setSize(float sz) const
 {
 	shader::uniform u_size = _shd["u_size"];
 	u_size = sz;
 }
-void cat::sparks::setIntensity(float v)
+void cat::sparks::setIntensity(float v) const
 {
 	shader::uniform u_int = _shd["u_int"];
 	u_int = v;
@@ -89,6 +89,7 @@ void cat::sparks::begin(const char* filepath, unsigned int count)
 	_loc_right = _shd.getlocation("u_right");
 	_loc_up    = _shd.getlocation("u_up");
 	_tex.createFromFile(filepath, true);
+	_tex.setfilter(cat::TEXTURE_FILTER::TF_LINEAR, cat::TEXTURE_FILTER::TF_LINEAR);
 	_count = count;
 	_vao.begin();
 }
@@ -111,10 +112,15 @@ void cat::sparks::end()
 	_vao.end();
 }
 
-void cat::sparks::draw(const camera& cam)
+void cat::sparks::render(const gbuffer& gbuf, const camera& cam)
 {
+	/*
+	  + prepare gbuffer
+	*/
+	gbuf.bind();
+	gbuf.switchBuffers(cat::gbuffer::BUFFER_LAYER::EMMISIVE);
+
 	glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendFunc(GL_ONE, GL_ONE);
 	_tex.active(0);
 	_shd.bind();
@@ -266,4 +272,60 @@ void cat::weed::draw(const camera& cam)
 
 cat::weed::~weed()
 {
+}
+
+void cat::sparksController::begin(const char* vs, const char* var0, const char* var1)
+{
+	const char* vars[2] = {
+		var0,
+		var1,
+	};
+	_shd.begin();
+	_shd.load(vs, shader::SHADER_TYPE::VERTEX_SHADER);
+	_shd.end(vars, 2);
+
+	for (auto& e : _vbos) {
+		delete e._ptr;
+	}
+	_vbos.clear();
+}
+
+// =========================================================================== //
+
+void cat::sparksController::addAttribute(const void* data, unsigned int sizeInBytes, int count, cat::VERTEX_TYPE type)
+{
+	auto ptr = new cat::vbo;
+	ptr->create(data, sizeInBytes);
+	_vbos.push_back({ ptr, count, type });
+}
+
+void cat::sparksController::end()
+{
+	unsigned int layout = 0;
+	_vao.begin();
+	for (auto& e : _vbos) {
+		_vao.addBuffer(*e._ptr, e._type, e._count, layout++);
+	}
+	_vao.end();
+}
+
+void cat::sparksController::update(const sparks& spk)
+{
+	_shd.bind();
+	feedback::bind(spk.getPos(), 0);
+	feedback::bind(spk.getInt(), 1);
+	feedback::begin(cat::feedback::FB_TYPE::FB_POINTS);
+	_vao.bind();
+	glDrawArrays(GL_POINTS, 0, spk.getCount());
+	feedback::end();
+	feedback::unbind(spk.getInt());
+	feedback::unbind(spk.getPos());
+}
+
+cat::sparksController::~sparksController()
+{
+	for (auto& e : _vbos) {
+		delete e._ptr;
+	}
+	_vbos.clear();
 }

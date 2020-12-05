@@ -2,15 +2,14 @@
 //@author:	zark
 //@time:	2020 / 6 / 1
 //note:
-// R3DMesh can both load static_mesh and dynamic_mesh(static_mesh with animation)
-//
+// R3DLoader can both load 'static' mesh and 'dynamic' mesh('dynamic' mesh is a 'static' mesh with animation)
 */
 #pragma once
 #include <string>
 #include "glm/glm.hpp"
 namespace cat
 {
-	class R3DMesh
+	class R3DLoader
 	{
 		float*			_xyz;	// x y z
 		float*			_uv;	// u v
@@ -23,8 +22,8 @@ namespace cat
 		__int32 _vtsCnt;
 		__int32 _idsCnt;
 	public:
-		R3DMesh();
-		virtual ~R3DMesh();
+		R3DLoader();
+		virtual ~R3DLoader();
 
 		void load(const char* filepath);
 		void load(const char* ptr, size_t size);
@@ -56,11 +55,12 @@ namespace cat
 		glm::mat4* _cmb = nullptr;
 		unsigned int _count = 0;
 	public:
-		~R3DBones() {
+		virtual ~R3DBones() {
 			free();
 		}
 		void free();
 		void load(const char* filepath);
+		void load(const char* ptr, size_t size);
 		void update(const glm::mat4& m);
 		void reset();
 		int getIndex(const char* name) const;
@@ -78,17 +78,18 @@ namespace cat
 			unsigned int _total = 0;
 			unsigned int _count = 0;
 			glm::mat4* _key = nullptr;
-			~animation();
+			virtual ~animation();
 			glm::mat4 interpolation(unsigned int time);
 		};
 		animation* _anim = nullptr;
 		unsigned int _count = 0;
 	public:
-		~R3DAnimation() {
+		virtual ~R3DAnimation() {
 			free();
 		}
 		void free();
 		void load(const char* filepath, const R3DBones& bn);
+		void load(const char* ptr, size_t size, const R3DBones& bn);
 		void update(unsigned int time, const R3DBones& bn) const;
 	};
 }

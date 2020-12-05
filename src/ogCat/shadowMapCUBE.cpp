@@ -6,8 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-static cat::camera g_cam;
-
 static const char* shadowMapCUBE_vs = 
 "#version 450 core                                      \n"
 "layout(location = 0) in vec3 position;                 \n"
@@ -57,7 +55,6 @@ static const char* shadowMapCUBE_fs =
 
 cat::shadowMapCUBE::shadowMapCUBE()
 {
-	g_cam.perspective(0.1f, 100.0f, 3.1415926f / 2.0f, 1.0f);
 	_loc_lit = _loc_far = _loc_mat = _loc_mdl = -1;
 }
 
@@ -95,10 +92,8 @@ void cat::shadowMapCUBE::create(unsigned int width, unsigned int height)
 	_tex.unbind();
 }
 
-void cat::shadowMapCUBE::begin(const glm::vec3& lightPos, float zNear, float zFar)
+void cat::shadowMapCUBE::setParameters(const glm::vec3& lightPos, float zNear, float zFar)
 {
-	_dep.bindForBoth();
-	renderer::ClearDepth();
 	_shd_genMap.bind();
 	_shd_genMap.setvec3(_loc_lit, lightPos);
 	_shd_genMap.setfloat(_loc_far, zFar);
@@ -118,25 +113,19 @@ void cat::shadowMapCUBE::begin(const glm::vec3& lightPos, float zNear, float zFa
 	}
 }
 
-void cat::shadowMapCUBE::beginPURE(const glm::vec3& lightPos, float zNear, float zFar)
+void cat::shadowMapCUBE::begin()
+{
+	_dep.bindForBoth();
+	renderer::ClearDepth();
+	//renderer::SetClearDepth(0.0f);
+	//renderer::SetClearDepth(1.0f);
+	_shd_genMap.bind();
+}
+
+void cat::shadowMapCUBE::beginPURE()
 {
 	_dep.bindForBoth();
 	_shd_genMap.bind();
-
-	float aspect = 1.0f;
-	float near = zNear;
-	float far = zFar;
-	glm::mat4 shadowProj = glm::perspective(3.1415926f / 2.0f, aspect, near, far);
-	glm::mat4 shadowTransforms[6];
-	shadowTransforms[0] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-	shadowTransforms[1] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-	shadowTransforms[2] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-	shadowTransforms[3] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-	shadowTransforms[4] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-	shadowTransforms[5] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
-	for (int i = 0; i < 6; i++) {
-		_shd_genMap.setmat4(_loc_mat + i, shadowTransforms[i]);
-	}
 }
 
 void cat::shadowMapCUBE::draw(const glm::mat4& world, const mesh& ms)
@@ -206,20 +195,22 @@ static const char* ACC_SM_fs =
 "    return u_color * min(factor * u_brightness, u_MaxBrightness)      \n"
 "           * (dotVal * diffuse + HN * specular.xyz);                  \n"
 "}                                                                     \n"
-"vec3 getXYZ(vec2 uv, float d){                                        \n"
-"    vec4 clip;                                                        \n"
-"    clip.xy = uv * 2.0 - 1.0;                                         \n"
-"    clip.z  = d  * 2.0 - 1.0;                                         \n"
-"    clip.w  = 1.0;                                                    \n"
-"    vec4 fnl = u_viewInv * clip;                                      \n"
-"    return fnl.xyz / fnl.w;                                           \n"
-"}                                                                     \n"
+//"vec3 getXYZ(vec2 uv, float d){                                        \n"
+//"    vec4 clip;                                                        \n"
+//"    clip.xy = uv * 2.0 - 1.0;                                         \n"
+//"    clip.z  = d  * 2.0 - 1.0;                                         \n"
+//"    clip.w  = 1.0;                                                    \n"
+//"    vec4 fnl = u_viewInv * clip;                                      \n"
+//"    return fnl.xyz / fnl.w;                                           \n"
+//"}                                                                     \n"
 "void main()                                                           \n"
 "{                                                                     \n"
-"    float d = texture(u_pos, v_uv).x;                                 \n"
-"    vec3 pos = getXYZ(v_uv, d);                                       \n"
+//"    float d = texture(u_pos, v_uv).x;                                 \n"
+//"    vec3 pos = getXYZ(v_uv, d);                                       \n"
+"    vec3 pos = texture(u_pos, v_uv).xyz;                              \n"
 "    vec3 nml = texture(u_nml, v_uv).xyz;                              \n"
 "    vec3 p2p = u_litPos - pos;                                        \n"
+//"    color = vec3(max(0, dot(p2p, nml) / length(p2p) ) ); return;"
 "    color = texture(u_lit, v_uv).xyz +                                \n"
 "         calculateShadow(pos) * calculateLight(p2p, nml) + u_ambient; \n"
 //"    ((dot(p2p, p2p) > u_brightness) ?                                 \n"
@@ -236,6 +227,7 @@ cat::shadowCUBEEffect::shadowCUBEEffect()
 	_loc_brightness = -1;
 	_loc_point      = -1;
 	_loc_viewInv    = -1;
+	_loc_max_brightness = -1;
 }
 
 void cat::shadowCUBEEffect::create()
@@ -258,24 +250,31 @@ void cat::shadowCUBEEffect::create()
 	_loc_ambient    = frameEffect::shader().getlocation("u_ambient");
 	_loc_brightness = frameEffect::shader().getlocation("u_brightness");
 	_loc_point      = frameEffect::shader().getlocation("u_litPos");
-	_loc_viewInv    = frameEffect::shader().getlocation("u_viewInv");
+	//_loc_viewInv    = frameEffect::shader().getlocation("u_viewInv");
+	_loc_max_brightness = frameEffect::shader().getlocation("u_MaxBrightness");
 }
 
-void cat::shadowCUBEEffect::applyEffect(shadowBuffer& shaBuf, const shadowMapCUBE& shaMap, const gbuffer& gbuf, const pointLight& lit, const camera& orgCam)
+void cat::shadowCUBEEffect::setLightParameters(const pointLight& lit)
 {
 	frameEffect::shader().bind();
-	frameEffect::shader().setvec3(_loc_view, glm::normalize(orgCam.getEye() - orgCam.getAt()));
 	frameEffect::shader().setvec3(_loc_color, lit.color);
 	frameEffect::shader().setvec3(_loc_ambient, lit.ambient);
 	frameEffect::shader().setvec3(_loc_point, lit.position);
 	frameEffect::shader().setfloat(_loc_brightness, lit.intensity);
-	glm::mat4 viewInv = glm::inverse(orgCam.comb());
-	frameEffect::shader().setmat4(_loc_viewInv, viewInv);
+}
+
+void cat::shadowCUBEEffect::applyEffect(shadowBuffer& shaBuf, const shadowMapCUBE& shaMap, const gbuffer& gbuf, const camera& orgCam)
+{
+	frameEffect::shader().bind();
+	frameEffect::shader().setvec3(_loc_view, glm::normalize(orgCam.getEye() - orgCam.getAt()));
+	//glm::mat4 viewInv = glm::inverse(orgCam.comb());
+	//frameEffect::shader().setmat4(_loc_viewInv, viewInv);
 
 	shaBuf.begin_shadow();
 	shaMap.getDep().active(0);
 	shaBuf.getTex().active(1);
-	gbuf.dep_tex().active(2);
+	//gbuf.dep_tex().active(2);
+	gbuf.pos_tex().active(2);	// @2020/11/4: fix bugs
 	gbuf.nml_tex().active(3);
 	gbuf.dif_tex().active(4);
 	gbuf.spe_tex().active(5);
@@ -293,6 +292,7 @@ void cat::shadowCUBEEffect::setFarPlane(float zFar) const
 {
 	if (zFar == 0.0f)
 		return;
+	frameEffect::shader().bind();
 	shader::uniform u_OneDivFar = frameEffect::shader()["u_OneDivFar"];
 	u_OneDivFar = 1.0f / zFar;
 }
@@ -301,6 +301,8 @@ void cat::shadowCUBEEffect::setMaxBrightness(float val) const
 {
 	if (val == 0.0f)
 		return;
-	shader::uniform u_MaxBrightness = frameEffect::shader()["u_MaxBrightness"];
-	u_MaxBrightness = val;
+	frameEffect::shader().bind();
+	frameEffect::shader().setfloat(_loc_max_brightness, val);
+	//shader::uniform u_MaxBrightness = frameEffect::shader()["u_MaxBrightness"];
+	//u_MaxBrightness = val;
 }

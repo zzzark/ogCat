@@ -25,9 +25,11 @@ static const char* fs =
 "uniform samplerCube u_sky;                        \n"
 "uniform float u_int = 1.0f;                       \n"
 "out vec3 color;                                   \n"
+"layout (depth_greater) out float gl_FragDepth;    \n"	// improve rendering performance
 "void main()                                       \n"
 "{                                                 \n"
 "    color = texture(u_sky, v_uvw).xyz * u_int;    \n"
+"    gl_FragDepth = 1.0f;                          \n"  // solve z-fighting
 "}                                                 \n"
 
 ;
@@ -42,6 +44,14 @@ cat::skyshader::skyshader()
 
 cat::skyshader::~skyshader()
 {
+}
+
+void cat::skyshader::prepareBuffer(gbuffer& gbuf) const
+{
+	gbuf.bind();
+	gbuf.switchBuffers(
+		gbuffer::BUFFER_LAYER::EMMISIVE
+	);
 }
 
 void cat::skyshader::setmat4(const glm::mat4& m) const
@@ -101,6 +111,9 @@ void cat::skybox::draw(const glm::mat4& cmb)
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_LEQUAL);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
 	_shd.bind();
 	_shd.setmat4(cmb * _orig);
 	_ao.bind();
@@ -110,4 +123,7 @@ void cat::skybox::draw(const glm::mat4& cmb)
 
 	glCullFace(oldCull);
 	glDepthFunc(oldDepth);
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+
 }

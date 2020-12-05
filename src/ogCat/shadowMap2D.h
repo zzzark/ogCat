@@ -14,9 +14,8 @@
 
 namespace cat
 {
-	class shadowMap2D
+	class shadowMap2D final
 	{
-	protected:
 		frameBuffer _dep;
 		shader _shd_genMap;
 		int _loc_mvp;
@@ -52,7 +51,8 @@ namespace cat
 	public:
 		shadow2DEffect();
 		void create();
-		void applyEffect(shadowBuffer& shaBuf, const shadowMap2D& shaMap, const gbuffer& gbuf, const directionalLight& lit, const camera& litCam, const camera& orgCam);
+		void setParameters(const camera& litCam, const directionalLight& lit);
+		void applyEffect(shadowBuffer& shaBuf, const shadowMap2D& shaMap, const gbuffer& gbuf, const camera& orgCam);
 		void setBias(float bias) const;
 		void setSize(float size) const;
 	};

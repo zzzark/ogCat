@@ -167,7 +167,7 @@ static const char* __fxaa =
 //"}                                                                  \n"
 //;
 
-void cat::postprc::create(gbuffer& gbf)
+void cat::postprc::create(const gbuffer& gbf)
 {
 	/* --- effects --- */
 	_eff_bloom_depart.create(__bloom_depart);
@@ -232,10 +232,20 @@ void cat::postprc::create(gbuffer& gbf)
 	_last_mvp = glm::mat4(1.0f);
 }
 
-void cat::postprc::process(gbuffer& gbf, shadowBuffer& sbf, camera& org)
+void cat::postprc::begin() const
+{
+	glDisable(GL_DEPTH_TEST);
+}
+
+void cat::postprc::end() const
+{
+	renderer::EndFrame();
+	glEnable(GL_DEPTH_TEST);
+}
+
+void cat::postprc::process(const gbuffer& gbf, shadowBuffer& sbf, camera& org)
 {
 	renderer::SetViewPort(0, 0, gbf.getWidth(), gbf.getHeight());
-	glDisable(GL_DEPTH_TEST);
 
 	/* ---- depart ---- */
 	_bloom.bindForBoth();
@@ -273,10 +283,8 @@ void cat::postprc::process(gbuffer& gbf, shadowBuffer& sbf, camera& org)
 	renderer::BeginFrame(0, 0, 0, 0);
 	_tmpbuf[0].active(0);
 	_eff_fxaa.renderPURE();
-	renderer::EndFrame();
 
 	_last_mvp = org.comb();
-	glEnable(GL_DEPTH_TEST);
 }
 
 ///* ---- depth blur ---- */

@@ -8,13 +8,14 @@
 #include "material.h"
 namespace cat
 {
-	class gbuffer
+	class gbuffer final
 	{
 		frameBuffer _gbuffer;
 
 		unsigned int _width  = 0;
 		unsigned int _height = 0;
 	public:
+		static const unsigned int MAX_BUFFER_LAYER_COUNT = 7;
 		enum BUFFER_LAYER {
 			NORMAL       = 0,
 			COLOR        = 1,
@@ -22,6 +23,7 @@ namespace cat
 			SPECULAR     = 3,
 			RECONG       = 4,
 			EMMISIVE     = 5,
+			POSITION     = 6,  /* @2020/11/14: fix bugs of rendering sparks */
 		};
 		// 0: normal
 		// 1: color
@@ -29,6 +31,7 @@ namespace cat
 		// 3: specular + shininess
 		// 4: recongnization
 		// 5: emmisive
+		// 6: position
 		//
 		void create(unsigned int width, unsigned int height);
 
@@ -43,6 +46,7 @@ namespace cat
 		inline void switchSpe() const { switchBuffer(BUFFER_LAYER::SPECULAR ); }
 		inline void switchReg() const { switchBuffer(BUFFER_LAYER::RECONG   ); }
 		inline void switchEmm() const { switchBuffer(BUFFER_LAYER::EMMISIVE ); }
+		inline void switchPos() const { switchBuffer(BUFFER_LAYER::POSITION ); }
 		inline unsigned int getWidth() const { return _width; }
 		inline unsigned int getHeight() const { return _height; }
 		inline const texture2D& nml_tex() const { return _gbuffer[BUFFER_LAYER::NORMAL   ]; }
@@ -51,6 +55,7 @@ namespace cat
 		inline const texture2D& spe_tex() const { return _gbuffer[BUFFER_LAYER::SPECULAR ]; }
 		inline const texture2D& reg_tex() const { return _gbuffer[BUFFER_LAYER::RECONG   ]; }
 		inline const texture2D& emm_tex() const { return _gbuffer[BUFFER_LAYER::EMMISIVE ]; }
+		inline const texture2D& pos_tex() const { return _gbuffer[BUFFER_LAYER::POSITION ]; }
 		inline const texture2D& dep_tex() const { return _gbuffer.getDep(); }
 
 		inline void bind()   const { _gbuffer.bindForBoth(); }

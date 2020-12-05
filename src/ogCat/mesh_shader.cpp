@@ -39,6 +39,7 @@ static const char* fs =
 "layout(location = 3) out vec4 spe;                     \n"
 "layout(location = 4) out vec3 reg;                     \n"
 "layout(location = 5) out vec3 emm;                     \n"
+"layout(location = 6) out vec3 pos;                     \n"
 "                                                       \n"
 "void main()                                            \n"
 "{                                                      \n"
@@ -48,9 +49,11 @@ static const char* fs =
 "    spe = vec4(u_spe, u_shi);                          \n"
 "    reg = u_reg;                                       \n"
 "    emm = u_emm;                                       \n"
+"    pos = v_pos;                                       \n"
 "}                                                      \n"
 ;
-void cat::mesh_shader::create()
+
+void cat::defaultMeshShader::create()
 {
 	shader::begin();
 	shader::load(vs, shader::SHADER_TYPE::VERTEX_SHADER);
@@ -69,14 +72,14 @@ void cat::mesh_shader::create()
 	tex = (int)(0);
 }
 
-void cat::mesh_shader::draw(const texture2D& tex, const material m, const glm::vec3& recg, const camera& cam, const glm::mat4& mdl, const mesh& ms) const
+void cat::defaultMeshShader::draw(const texture2D& tex, const material& mtl, const glm::vec3& recg, const camera& cam, const glm::mat4& mdl, const mesh& ms) const
 {
 	if (ms.getib().getCount() == 0)
 		return;
-	shader::setvec3(_loc_emm, m.emmisive);
-	shader::setvec3(_loc_dif, m.diffuse);
-	shader::setvec3(_loc_spe, m.specular);
-	shader::setfloat(_loc_shi, m.shininess);
+	shader::setvec3(_loc_emm, mtl.emmisive);
+	shader::setvec3(_loc_dif, mtl.diffuse);
+	shader::setvec3(_loc_spe, mtl.specular);
+	shader::setfloat(_loc_shi, mtl.shininess);
 	shader::setvec3(_loc_reg, recg);
 	shader::setmat4(_loc_MVP, cam.mvp(mdl));
 	shader::setmat4(_loc_MDL, mdl);
@@ -85,5 +88,27 @@ void cat::mesh_shader::draw(const texture2D& tex, const material m, const glm::v
 	ms.getvao().bind();
 	ms.getib().bind();
 	glDrawElements(GL_TRIANGLES, ms.getib().getCount(), GL_UNSIGNED_INT, nullptr);
+}
 
+void cat::defaultMeshShader::prepareBuffer(const gbuffer& gbuf)
+{
+	gbuf.bind();
+	gbuf.switchBuffers(
+		gbuffer::BUFFER_LAYER::NORMAL,
+		gbuffer::BUFFER_LAYER::COLOR,
+		gbuffer::BUFFER_LAYER::DIFFUSE,
+		gbuffer::BUFFER_LAYER::SPECULAR,
+		gbuffer::BUFFER_LAYER::RECONG,
+		gbuffer::BUFFER_LAYER::EMMISIVE,
+		gbuffer::BUFFER_LAYER::POSITION
+	);
+	//gbuf.bind();
+	//gbuf.switchBuffers(
+	//	gbuffer::BUFFER_LAYER::NORMAL,
+	//	gbuffer::BUFFER_LAYER::EMMISIVE,
+	//	gbuffer::BUFFER_LAYER::DIFFUSE,
+	//	gbuffer::BUFFER_LAYER::SPECULAR,
+	//	gbuffer::BUFFER_LAYER::RECONG,
+	//	gbuffer::BUFFER_LAYER::COLOR
+	//);
 }

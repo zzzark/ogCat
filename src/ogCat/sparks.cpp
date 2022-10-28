@@ -18,6 +18,11 @@ void cat::spark_effect::sparks::setRate(float val)
 	_rate = val;
 }
 
+void cat::spark_effect::sparks::reset()
+{
+	_now = 0;
+}
+
 void cat::spark_effect::sparks::_undateNow(unsigned int timeDelta)
 {
 	_now += _rate * ((float)(timeDelta) / 1000.0f);

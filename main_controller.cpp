@@ -1,4 +1,8 @@
-#include "game/gmSys.h"
+/*
+@author: zrk
+@date:   2020/12/9
+*/
+#include "../game/gmSys.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 static const unsigned int action_release = 0;
@@ -22,6 +26,9 @@ static bool g_bs = false;	// BACK
 static bool g_bz = false;	// DOWN
 static bool g_bc = false;	// UP
 
+static bool g_vk = false;
+
+
 static bool g_lock_cursor = false;
 
 static float g_dx = 0;
@@ -30,11 +37,15 @@ static float g_dz = 0;
 static float g_dt = 0;
 static float g_dp = 0;
 
+static glm::vec3 g_last_at(1.0f);
+static glm::vec3 g_last_eye(1.0f);
 
 static void delta(float dx, float dy, float dz, float dt, float dp)
 {
-	glm::vec3 at  = g_gmsys.get_at();
-	glm::vec3 eye = g_gmsys.get_eye();
+	g_last_at  = g_gmsys.get_at();
+	g_last_eye = g_gmsys.get_eye();
+	auto at = g_last_at;
+	auto eye = g_last_eye;
 	glm::vec3 dir = at - eye;
 	if (dx || dz) {
 		glm::vec3 zdir(dir.x, 0, dir.z);
@@ -51,11 +62,13 @@ static void delta(float dx, float dy, float dz, float dt, float dp)
 		glm::vec4 fnl;
 		fnl = glm::rotate(glm::mat4(1.0f), dp, glm::normalize(glm::vec3(-dir.z, 0, dir.x))) * glm::vec4(dir, 0);
 		fnl = glm::rotate(glm::mat4(1.0f), dt, glm::normalize(glm::vec3(0, 1, 0))) * fnl;
-		glm::vec3 fnl3(fnl.x, fnl.y, fnl.z);
-		float dt = dot(fnl3, glm::vec3(0, 1, 0));
-		if (dt * dt <= dot(fnl3, fnl3) * 0.9f)
-			at = glm::vec3(fnl.x, fnl.y, fnl.z) + eye;
-		//eye = at - glm::vec3(fnl.x, fnl.y, fnl.z);
+		glm::vec3 fnl3 = glm::vec3(fnl.x, fnl.y, fnl.z);
+		float dt = glm::dot(fnl3, glm::vec3(0, 1, 0));
+		if (dt < -glm::length(fnl3) * 0.1f && dt * dt <= glm::dot(fnl3, fnl3) * 0.9f)
+			eye = at - fnl3;
+		//if (dt * dt <= glm::dot(fnl3, fnl3) * 0.9f)
+		//	eye = at - fnl3;
+			//at = glm::vec3(fnl.x, fnl.y, fnl.z) + eye;
 	}
 	g_gmsys.set_at(at);
 	g_gmsys.set_eye(eye);
@@ -68,6 +81,12 @@ void ctrl_get_deltas(float& dx, float& dy, float& dz, float& dt, float& dp)
 	dz = g_dz;
 	dt = g_dt;
 	dp = g_dp;
+}
+
+void ctrl_get_keys(bool& v)
+{
+	v = g_vk;
+	g_vk = false;
 }
 
 void ctrl_handle_events()
@@ -86,13 +105,22 @@ void ctrl_key(int key, int scancode, int action, int modes)
 		g_lock_cursor = !g_lock_cursor;
 		g_gmsys.lockCursor(g_lock_cursor);
 	}
-	{ if (key == 'A' && action == action_press) g_ba = true; else if (key == 'A' && action == action_release) g_ba = false; }
-	{ if (key == 'D' && action == action_press) g_bd = true; else if (key == 'D' && action == action_release) g_bd = false; }
+	//{ if (key == 'A' && action == action_press) g_ba = true; else if (key == 'A' && action == action_release) g_ba = false; }
+	//{ if (key == 'D' && action == action_press) g_bd = true; else if (key == 'D' && action == action_release) g_bd = false; }
 	{ if (key == 'S' && action == action_press) g_bs = true; else if (key == 'S' && action == action_release) g_bs = false; }
 	{ if (key == 'W' && action == action_press) g_bw = true; else if (key == 'W' && action == action_release) g_bw = false; }
-	{ if (key == 'C' && action == action_press) g_bz = true; else if (key == 'C' && action == action_release) g_bz = false; }
-	{ if (key == ' ' && action == action_press) g_bc = true; else if (key == ' ' && action == action_release) g_bc = false; }
+	//{ if (key == 'C' && action == action_press) g_bz = true; else if (key == 'C' && action == action_release) g_bz = false; }
+	//{ if (key == ' ' && action == action_press) g_bc = true; else if (key == ' ' && action == action_release) g_bc = false; }
 	{ if (key == 256 && action == action_press) g_gmsys.exit(); }  // ESC
+	
+	
+	{ if (key == 'V' && action == action_press)
+		g_vk = true;
+	else if (key == 'V' && action == action_release)
+		g_vk = false;
+	else if (key == 'V' && action == action_repeat)
+		g_vk = false;
+	}
 }
 
 void ctrl_scroll(double xoff, double yoff)
@@ -113,4 +141,10 @@ void ctrl_cursor(double x, double y)
 	g_dp = (float)(lastY - y) * g_cam_percisionP;
 	
 	delta(0, 0, 0, g_dt, g_dp);
+}
+
+void ctrl_back()
+{
+	g_gmsys.set_at(g_last_at);
+	g_gmsys.set_eye(g_last_eye);
 }

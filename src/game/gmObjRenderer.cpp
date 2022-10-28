@@ -54,7 +54,17 @@ void ogm::gmObjRenderer::render(gmObj& obj, gmSurface& suf, gmSys& sys)
 		dms->update(*anim, (unsigned int)sys.getNowTime(), glm::mat4(1.0f));
 		_baker->bake(*dms, *bone);
 	}
-	if (inst) {
+	if (inst && inst->getMesh()) {
 		_shader->draw(inst->getTex(), inst->mtl, inst->rec, *(sys.cameraPointer()), inst->mdl, *(inst->getMesh()));
 	}
+}
+
+void ogm::gmObjRenderer::render(
+	cat::mesh* ms, cat::texture2D* tex,
+	const cat::material* mtl, const glm::mat4& mat,
+	const glm::vec3& rec, gmSurface& suf, gmSys& sys)
+{
+	if (!_baker || !_shader || !tex || !ms) return;
+	_shader->draw(*tex, *mtl, rec, *(sys.cameraPointer()), mat, *ms);
+
 }

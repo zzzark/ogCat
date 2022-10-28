@@ -11,7 +11,6 @@ include_directories(src/vendor/glew/include)
 include_directories(src/vendor/glfw/include)
 
 include_directories(src/vendor/glm)
-include_directories(src/vendor/assimp)
 include_directories(src/vendor/imgui)
 include_directories(src/vendor/stb_image)
 

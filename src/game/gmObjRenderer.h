@@ -6,6 +6,9 @@ namespace cat
 {
 	class mesh_baker;
 	class meshShader;
+	class mesh;
+	class texture2D;
+	struct material;
 }
 namespace ogm
 {
@@ -24,5 +27,9 @@ namespace ogm
 		void begin(gmSurface& suf) const;
 		void end() const;
 		void render(gmObj& obj, gmSurface& suf, gmSys& sys);
+		void render(
+			cat::mesh* ms, cat::texture2D* tex,
+			const cat::material* mtl, const glm::mat4& mat, 
+			const glm::vec3& rec, gmSurface& suf, gmSys& sys);
 	};
 }

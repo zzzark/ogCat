@@ -296,11 +296,7 @@ void cat::sparksController::addAttribute(const void* data, unsigned int sizeInBy
 {
 	auto ptr = new cat::vbo;
 	ptr->create(data, sizeInBytes);
-	cat::sparksController::vbo_layout layout;
-	layout._ptr = ptr;
-	layout._count = count;
-	layout._type = type;
-	_vbos.push_back(layout);
+	_vbos.push_back({ ptr, count, type });
 }
 
 void cat::sparksController::end()
@@ -308,7 +304,7 @@ void cat::sparksController::end()
 	unsigned int layout = 0;
 	_vao.begin();
 	for (auto& e : _vbos) {
-		_vao.addBuffer(*e._ptr, e._type, e._count, (int)(layout++));
+		_vao.addBuffer(*e._ptr, e._type, e._count, layout++);
 	}
 	_vao.end();
 }

@@ -18,7 +18,7 @@ namespace spark_effect
 		void create(const char* filepath, unsigned int count, float visible_range, float y_sky, float y_ground);
 		void setHeight(float miny, float maxy) const;
 		void move(float x, float z) const;
-		void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
+		virtual void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
 	};
 
 	class fireworks final : public cat::spark_effect::sparks
@@ -31,7 +31,7 @@ namespace spark_effect
 		void loop(bool opts);
 		void create(const char* filepath, unsigned int count, const glm::vec3& center, float radius, float rate);
 		void move(const glm::vec3& pos) const;
-		void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
+		virtual void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
 
 	};
 }
@@ -188,7 +188,7 @@ void cat::spark_effect::fireworks::render(const cat::gbuffer& gbuf, unsigned int
 		_undateNow(timeDelta);
 	else {
 		_now += _rate * ((float)(timeDelta) / 1000.0f);
-		if (_now >= 2.0f) {
+		if (_now >= 1.0f) {
 			return;
 		}
 	}
@@ -235,6 +235,12 @@ void ogm::gmParticle::render(const ogm::gmSurface& suf, const ogm::gmSys& sys)
 		_weak_ptr->render(*suf.gbufferPointer(), (unsigned int)sys.getTimeDelta(), *sys.cameraPointer());
 }
 
+void ogm::gmParticle::reset()
+{
+	if (_weak_ptr)
+		_weak_ptr->reset();
+}
+
 ogm::gmParticle::~gmParticle()
 {
 	destroy();
@@ -260,6 +266,12 @@ void ogm::gmDust::setHeight(float miny, float maxy) const
 		_dust->setHeight(miny, maxy);
 }
 
+void ogm::gmDust::destroy()
+{
+	_dust = nullptr;
+	gmParticle::destroy();
+}
+
 void ogm::gmFireworks::createFireworks(const char* filepath, unsigned int count, const glm::vec3& center, float radius, float rate)
 {
 	auto ptr = new cat::spark_effect::fireworks();
@@ -278,4 +290,10 @@ void ogm::gmFireworks::loop(bool opts)
 {
 	if (_fire != nullptr)
 		_fire->loop(opts);
+}
+
+void ogm::gmFireworks::destroy()
+{
+	_fire = nullptr;
+	gmParticle::destroy();
 }

@@ -27,14 +27,15 @@ namespace ogm
 
 	public:
 		void initialize(cat::spark_effect::sparks* spk);
-		void destroy();
 
 		void setIntensity(float val) const;
 		void setSize(float val) const;
 		void setRate(float val);
 		void render(const ogm::gmSurface& suf, const ogm::gmSys& sys);
 
+		void reset();
 		virtual ~gmParticle();
+		virtual void destroy();
 	};
 
 	class gmDust : virtual public gmParticle
@@ -46,6 +47,8 @@ namespace ogm
 
 		void move(float x, float z) const;
 		void setHeight(float miny, float maxy) const;
+
+		virtual void destroy();
 	};
 
 	class gmFireworks : virtual public gmParticle
@@ -57,5 +60,7 @@ namespace ogm
 
 		void move(const glm::vec3& pos);
 		void loop(bool opts);
+
+		virtual void destroy();
 	};
 }

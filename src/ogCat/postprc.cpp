@@ -62,7 +62,7 @@ static const char* __hdr_combine =
 "in vec2 v_uv;                               \n"
 "uniform sampler2D u_org;                    \n"
 "uniform sampler2D u_blm;                    \n"
-"uniform float u_factor = 1.22;              \n"
+"uniform float u_factor = 1.0;               \n"
 "out vec3 cl;                                \n"
 "void main()                                 \n"
 "{                                           \n"

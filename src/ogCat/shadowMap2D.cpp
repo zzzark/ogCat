@@ -189,8 +189,6 @@ void cat::shadow2DEffect::setParameters(const camera& litCam, const directionalL
 	frameEffect::shader().bind();
 	frameEffect::shader().setmat4(_loc_SM_mat4, litCam.comb());
 	frameEffect::shader().setvec3(_loc_dir, -glm::normalize(lit.direction));
-	frameEffect::shader().setmat4(_loc_SM_mat4, litCam.comb());
-	frameEffect::shader().setvec3(_loc_dir, -glm::normalize(lit.direction));
 	frameEffect::shader().setvec3(_loc_color, lit.color);
 	frameEffect::shader().setvec3(_loc_ambient, lit.ambient);
 	frameEffect::shader().setfloat(_loc_brightness, lit.intensity);

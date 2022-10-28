@@ -24,8 +24,8 @@ namespace ogm
 		static void _s_mousep(void*, int, int, int);
 	private:
 		bool _is_created = false;
-		unsigned long long _lastTime = 0;
-		unsigned long long _nowTime = 0;
+		unsigned long long _lastTime;
+		unsigned long long _nowTime;
 	public:
 		typedef void (*fun_keybrd)(int key, int scancode, int action, int modes);
 		typedef void (*fun_scroll)(double xoff, double yoff);
@@ -85,8 +85,8 @@ namespace ogm
 		void setFOV(float fov) const;
 		float getFarPlane()  const { return _zFar; }
 		float getNearPlane() const { return _zNear; }
-		glm::vec3 get_eye() const;
-		glm::vec3 get_at()  const;
+		const glm::vec3& get_eye() const;
+		const glm::vec3& get_at()  const;
 		void set_eye(const glm::vec3& eye) const;
 		void set_at (const glm::vec3& at)  const;
 

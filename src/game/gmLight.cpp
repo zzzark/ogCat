@@ -6,25 +6,23 @@
 #include "ogCat/shadowMap2D.h"
 
 void ogm::gmLight::defaultLightFunction(float& r, float& g, float& b, float& intensity, float& ar, float& ag, float& ab, float& maxval)
- {
+{
 	if (r < 0) r = 0;
 	if (g < 0) g = 0;
 	if (b < 0) b = 0;
-	float len = std::sqrt(r * r + g * g + b * b);
+	float len = sqrt(r * r + g * g + b * b);
 	intensity = len / 1.73205f;
 	r /= len;
 	g /= len;
 	b /= len;
-	ar = r * intensity / 10.0f;
-	ag = g * intensity / 10.0f;
-	ab = b * intensity / 10.0f;
+	ar = r * intensity / 7.0f;
+	ag = g * intensity / 7.0f;
+	ab = b * intensity / 7.0f;
 	if (ar > 0.707106f) ar = 0.707106f;
 	if (ag > 0.707106f) ag = 0.707106f;
 	if (ab > 0.707106f) ab = 0.707106f;
-	maxval = intensity * 2.71828f;
+	maxval = intensity * 3.0f;
 }
-
-ogm::gmLight::~gmLight() = default;
 
 // ===================================================================================================== //
 
@@ -108,12 +106,14 @@ void ogm::gmPointLight::draw(const glm::mat4& mdl, const cat::mesh& ms)
 
 void ogm::gmPointLight::draw(const ogm::gmObj& obj)
 {
-	draw(*obj.meshInstancePointer());
+	if(obj.meshInstancePointer())
+		draw(*obj.meshInstancePointer());
 }
 
 void ogm::gmPointLight::draw(const cat::meshInstance& inst)
 {
-	draw(inst.mdl, *inst.getMesh());
+	if(inst.getMesh())
+		draw(inst.mdl, *inst.getMesh());
 }
 
 void ogm::gmPointLight::end()
@@ -134,6 +134,13 @@ ogm::gmPointLight::~gmPointLight()
 	delete _map; _map = nullptr;
 	delete _eff; _eff = nullptr;
 
+}
+
+void ogm::gmPointLight::release()
+{
+	delete _pl;   _pl = nullptr;
+	delete _map; _map = nullptr;
+	delete _eff; _eff = nullptr;
 }
 
 // ===================================================================================================== //
@@ -174,7 +181,7 @@ void ogm::gmDirectionalLight::create(unsigned int resolution, float size, float 
 	_eff->setBias(0.002f);
 	_eff->setSize((float)resolution);
 
-	move(0, 0, 0, 0);
+	move(0, 0, 1.57f, 1.57f, 1, 0);
 	setRGB(1, 1, 1);
 }
 
@@ -183,11 +190,18 @@ void ogm::gmDirectionalLight::setLightFunction(light_func new_func)
 	_litFunc = !new_func ? gmLight::defaultLightFunction : new_func;
 }
 
-void ogm::gmDirectionalLight::move(float x, float y, float z, float theta)
+void ogm::gmDirectionalLight::move(float x, float z, float phy, float theta, float y_sky, float y_ground)
 {
 	if (_cam) {
-		_cam->walk(glm::vec3(x, y, z));
-		_cam->look(glm::vec3(0, 0, 0));
+		_cam->look(glm::vec3(x, y_ground, z));
+		if (phy != 0) {
+			float r = (y_sky - y_ground) / tan(phy);
+			if (!isnan(r) && !isinf(r)) {
+				x = x + r * cos(theta);
+				z = z + r * sin(theta);
+			}
+		}
+		_cam->walk(glm::vec3(x, y_sky, z));
 		_lit->direction = glm::normalize(_cam->getAt() - _cam->getEye());
 		_refresh();
 	}
@@ -231,12 +245,14 @@ void ogm::gmDirectionalLight::draw(const glm::mat4& mdl, const cat::mesh& ms)
 
 void ogm::gmDirectionalLight::draw(const ogm::gmObj& obj)
 {
-	draw(*obj.meshInstancePointer());
+	if(obj.meshInstancePointer())
+		draw(*obj.meshInstancePointer());
 }
 
 void ogm::gmDirectionalLight::draw(const cat::meshInstance& inst)
 {
-	draw(inst.mdl, *inst.getMesh());
+	if(inst.getMesh())
+		draw(inst.mdl, *inst.getMesh());
 }
 
 void ogm::gmDirectionalLight::end()
@@ -252,6 +268,14 @@ void ogm::gmDirectionalLight::apply(const gmSys& sys, const gmSurface& suf)
 }
 
 ogm::gmDirectionalLight::~gmDirectionalLight()
+{
+	delete _cam; _cam = nullptr;
+	delete _lit; _lit = nullptr;
+	delete _map; _map = nullptr;
+	delete _eff; _eff = nullptr;
+}
+
+void ogm::gmDirectionalLight::release()
 {
 	delete _cam; _cam = nullptr;
 	delete _lit; _lit = nullptr;

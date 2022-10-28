@@ -1,0 +1,17 @@
+R3DINFO DYNAMIC
+model   res/models/boxman.bin
+bones   res/models/boxman.bon
+anims   res/models/boxman.ani
+texture res/textures/boxman1.jpg
+normal  0
+emm     0 0 0
+dif     .7 .7 .7
+spe     .2 .2 .2
+shi     1.0
+matrix
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+bounding 1
+-0.3 0 -0.3 0.6 2 0.6

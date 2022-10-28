@@ -5,8 +5,8 @@ anims   0
 texture res/textures/ground.jpg
 normal  0
 emm     0.0 0.0 0.0
-dif     0.8 0.8 0.7
-spe     0.1 0.1 0.1
+dif     .5 .5 .5
+spe     .5 .5 .5
 shi     5.0
 matrix
 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1

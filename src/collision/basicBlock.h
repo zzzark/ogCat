@@ -22,6 +22,7 @@ namespace collision
         //  return true if there is a point of block "bk" that inside block "this"
         bool _test(const basicBlock& bk) const;
     public:
+        basicBlock();
         void set(const glm::vec3 o, float x, float y, float z);
         void update(const glm::mat4& mat);
 

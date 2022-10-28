@@ -1,0 +1,14 @@
+R3DINFO STATIC
+model   res/models/antidote.bin
+bones   0
+anims   0
+texture res/textures/antidote.jpg
+normal 0
+emm     0 0 0
+dif     0.8 0.8 0.8
+spe     0.8 0.8 0.6
+shi     3
+matrix
+1 0 0 0 0 1 0 0 0 0 1 0 0 0.5 0 1
+bounding 1
+-0.400319 -0.0786721 -0.400319 0.800638 0.157344 0.800638

@@ -18,7 +18,7 @@ namespace cat
 
 namespace ogm
 {
-	class gmObj final : protected collision::basicBlock
+	class gmObj final : public collision::basicBlock
 	{
 	public:
 		enum class GMOBJ_ERR {
@@ -57,6 +57,8 @@ namespace ogm
 		static const char* _s_bounding;
 	public:
 		GMOBJ_ERR createFromFile(const char* filepath);
+		void release();
+
 		gmObj() {}
 		~gmObj();
 
@@ -67,8 +69,12 @@ namespace ogm
 		void move(float dx, float dy, float dz);
 		void moveTo(float x, float y, float z);
 		void moveTo(const glm::vec3& pos);
+		void setID(const glm::vec3& v);
 
+		bool isValid();
+		
 		glm::mat4& get_model_matrix();
+		glm::vec3 get_pos() const;
 
 		GMOBJ_DYNAMIC_STATE getState() { return _state; }
 

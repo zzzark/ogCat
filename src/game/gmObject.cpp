@@ -83,6 +83,7 @@ ogm::gmObj::GMOBJ_ERR ogm::gmObj::createFromFile(const char* filepath)
 		_bon->load(fbon.c_str());
 		_ani->load(fani.c_str(), *_bon);
 		_inst->loadDynamicMesh(fbin.c_str(), *_bon);
+		_inst->getDynamicMesh()->update(*_ani, 0, glm::mat4(1.0f));
 	}
 	// texture
 	if (read2String(ifs, sa, sb) == false) return GMOBJ_ERR::ERR_FORMAT;
@@ -123,8 +124,14 @@ ogm::gmObj::GMOBJ_ERR ogm::gmObj::createFromFile(const char* filepath)
 		collision::basicBlock::set(pos, x, y, z);
 	}
 	collision::basicBlock::update(_inst->mdl);
-
 	return GMOBJ_ERR::ERR_NO_ERROR;
+}
+
+void ogm::gmObj::release()
+{
+	_inst = nullptr;
+	_bon = nullptr;
+	_ani = nullptr;
 }
 
 ogm::gmObj::~gmObj()
@@ -189,6 +196,17 @@ void ogm::gmObj::moveTo(const glm::vec3& pos)
 	}
 }
 
+void ogm::gmObj::setID(const glm::vec3& v)
+{
+	if (_inst)
+		_inst->rec = v;
+}
+
+bool ogm::gmObj::isValid()
+{
+	return _inst != nullptr;
+}
+
 glm::mat4& ogm::gmObj::get_model_matrix()
 {
 	static glm::mat4 identity(1);
@@ -196,4 +214,15 @@ glm::mat4& ogm::gmObj::get_model_matrix()
 		return _inst->mdl;
 	else
 		return identity;
+}
+
+glm::vec3 ogm::gmObj::get_pos() const
+{
+	glm::vec3 pos;
+	if (_inst) {
+		pos.x = _inst->mdl[3][0];
+		pos.y = _inst->mdl[3][1];
+		pos.z = _inst->mdl[3][2];
+	}
+	return pos;
 }

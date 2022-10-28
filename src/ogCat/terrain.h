@@ -5,6 +5,7 @@
 #pragma once
 #include "R2DLoader.h"
 #include "mesh.h"
+#include "texture2D.h"
 namespace cat
 {
 	class terrainBlock : public static_mesh

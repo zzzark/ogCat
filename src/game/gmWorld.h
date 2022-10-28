@@ -5,12 +5,16 @@
 
 #pragma once
 #include "gmRenderer.h"
+#include "gmObjRenderer.h"
+#include "gmObjRenderer.h"
 #include <memory>
 
 namespace cat
 {
 	class mesh;
 	class skybox;
+	class terrainBlock;
+	class texture2D;
 }
 
 namespace ogm
@@ -31,5 +35,18 @@ namespace ogm
 		void rotateY(float rad);
 		void setIntensity(float val) const;
 		void renderTheSkey(gmSys& sys, gmSurface& suf);
+
+		void release();
+	};
+
+	class gmGround final
+	{
+		std::shared_ptr<cat::texture2D> _tex;
+		std::shared_ptr<cat::terrainBlock> _ground;
+	public:
+		void create(const char* texFilepath, const char* filepath, float Yscale, float XZscale, float UVscale, float XOffset, float Zoffset, float Yoffset);
+		void renderTheGround(gmObjRenderer& objRenderer, gmSys& sys, gmSurface& suf);
+
+		void release();
 	};
 }

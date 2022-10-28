@@ -1,0 +1,14 @@
+R3DINFO STATIC
+model   res/models/column.bin
+bones   0
+anims   0
+texture res/textures/column.jpg
+normal 0
+emm     0 0 0
+dif     .6 .6 .6
+spe     .5 .5 .5
+shi     1
+matrix
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+bounding 1
+-1 0 -1 2 1 2

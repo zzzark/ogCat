@@ -108,20 +108,22 @@ void ogm::gmSys::refresh()
 	_lockCursor();
 }
 
-glm::vec3 ogm::gmSys::get_eye() const
+const glm::vec3& ogm::gmSys::get_eye() const
 {
+	static const glm::vec3 tmp(0);
 	if (_cam) {
 		return _cam->getEye();
 	}
-	return glm::vec3();
+	return tmp;
 }
 
-glm::vec3 ogm::gmSys::get_at() const
+const glm::vec3& ogm::gmSys::get_at() const
 {
+	static const glm::vec3 tmp(0);
 	if (_cam) {
 		return _cam->getAt();
 	}
-	return glm::vec3();
+	return tmp;
 }
 
 void ogm::gmSys::set_eye(const glm::vec3& eye) const

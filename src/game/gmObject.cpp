@@ -1,8 +1,8 @@
 #include <fstream>
-#include "../game/gmObject.h"
-#include "dynamic_mesh.h"
-#include "mesh_instance.h"
-#include "R3DLoader.h"
+#include "gmObject.h"
+#include "ogCat/dynamic_mesh.h"
+#include "ogCat/mesh_instance.h"
+#include "ogCat/R3DLoader.h"
 
 
 const char* ogm::gmObj::_s_header   = "R3DINFO";

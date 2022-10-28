@@ -1,6 +1,6 @@
 #include "R3DLoader.h"
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <iostream>
 
 static const char R3D_HEADER_STATIC[] =    { "R3D_STATIC" };

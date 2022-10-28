@@ -1,5 +1,5 @@
 #include "gmParticle.h"
-#include "../ogCat/sparks.h"
+#include "ogCat/sparks.h"
 
 namespace cat
 {
@@ -18,7 +18,7 @@ namespace spark_effect
 		void create(const char* filepath, unsigned int count, float visible_range, float y_sky, float y_ground);
 		void setHeight(float miny, float maxy) const;
 		void move(float x, float z) const;
-		virtual void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
+		void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
 	};
 
 	class fireworks final : public cat::spark_effect::sparks
@@ -31,7 +31,7 @@ namespace spark_effect
 		void loop(bool opts);
 		void create(const char* filepath, unsigned int count, const glm::vec3& center, float radius, float rate);
 		void move(const glm::vec3& pos) const;
-		virtual void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
+		void render(const cat::gbuffer& gbuf, unsigned int timeDelta, const cat::camera& cam) override;
 
 	};
 }

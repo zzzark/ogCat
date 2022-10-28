@@ -1,6 +1,8 @@
 #include "dynamic_mesh.h"
 #include "dbg.h"
 
+cat::mesh::~mesh() = default;
+
 //=====================================================================================================================//
 void cat::dynamic_mesh::load(const char* binFile, R3DBones& bones)
 {

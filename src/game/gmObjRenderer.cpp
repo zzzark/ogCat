@@ -1,7 +1,7 @@
-#include "../game/gmObjRenderer.h"
-#include "../ogCat/mesh_instance.h"
-#include "../ogCat/dynamic_mesh.h"
-#include "../ogCat/mesh_shader.h"
+#include "gmObjRenderer.h"
+#include "ogCat/mesh_instance.h"
+#include "ogCat/dynamic_mesh.h"
+#include "ogCat/mesh_shader.h"
 
 void ogm::gmObjRenderer::initialize()
 {

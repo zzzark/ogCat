@@ -5,7 +5,7 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "gmRenderer.h"
-#include "../collision/basicBlock.h"
+#include "collision/basicBlock.h"
 
 #include <memory>
 

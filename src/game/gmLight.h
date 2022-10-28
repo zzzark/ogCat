@@ -4,8 +4,8 @@
 */
 
 #pragma once
-#include "../game/gmSys.h"
-#include "../game/gmObject.h"
+#include "gmSys.h"
+#include "gmObject.h"
 
 namespace cat
 {
@@ -28,21 +28,18 @@ namespace ogm
 		typedef void (*light_func)(float& r, float& g, float& b, float& intensity, float& ar, float& ag, float& ab, float& maxval);
 		static void defaultLightFunction(float& r, float& g, float& b, float& intensity, float& ar, float& ag, float& ab, float& maxval);
 	public:
-		virtual void begin() = 0 {};
-		virtual void draw(const gmObj& obj) = 0 {};
-		virtual void draw(const cat::meshInstance& inst) = 0 {};
-		virtual void draw(const glm::mat4& mdl, const cat::mesh& ms) = 0 {};
-		virtual void end() = 0 {};
+		virtual void begin() = 0;
+		virtual void draw(const gmObj& obj) = 0;
+		virtual void draw(const cat::meshInstance& inst) = 0;
+		virtual void draw(const glm::mat4& mdl, const cat::mesh& ms) = 0;
+		virtual void end() = 0;
 
-		virtual void apply(const gmSys& sys, const gmSurface& suf) = 0 {};
-		virtual ~gmLight() = 0 {};
+		virtual void apply(const gmSys& sys, const gmSurface& suf) = 0;
+		virtual ~gmLight() = 0;
 	};
 
 	class gmPointLight final : public gmLight
 	{
-		gmPointLight(gmPointLight&) = delete;
-		void operator=(gmPointLight&) = delete;
-
 		gmLight::light_func _litFunc = gmLight::defaultLightFunction;
 		float _zFar = 0;
 		float _zNear = 0;
@@ -52,7 +49,9 @@ namespace ogm
 		cat::shadowCUBEEffect* _eff = nullptr;
 		void _refresh();
 	public:
-		gmPointLight() {}
+        gmPointLight(gmPointLight&) = delete;
+        void operator=(gmPointLight&) = delete;
+		gmPointLight() = default;
 
 		void create(unsigned int resolution = 1024, float zNear = 0.1f, float zFar = 1000.0f);
 		void setLightFunction(light_func new_func);
@@ -64,14 +63,14 @@ namespace ogm
 		//	in the situation that 1.0f equals to one meter
 		//
 		void sysSetBias(float bias = 0.00005f);
-		virtual void begin() override;
-		virtual void draw(const gmObj& obj) override;
-		virtual void draw(const cat::meshInstance& inst) override;
-		virtual void draw(const glm::mat4& mdl, const cat::mesh& ms) override;
-		virtual void end() override;
+		void begin() override;
+		void draw(const gmObj& obj) override;
+		void draw(const cat::meshInstance& inst) override;
+		void draw(const glm::mat4& mdl, const cat::mesh& ms) override;
+		void end() override;
 
-		virtual void apply(const gmSys& sys, const gmSurface& suf) override;
-		virtual ~gmPointLight();
+		void apply(const gmSys& sys, const gmSurface& suf) override;
+		~gmPointLight() override;
 
 	};
 

@@ -33,7 +33,7 @@ namespace cat
 		inline const vbo& getstr() const { return _str; }
 		inline const vibo& getib() const { return _ib; }
 
-		virtual ~mesh() = 0 {};
+		virtual ~mesh() = 0;
 	};
 	class static_mesh : protected R3DLoader, public mesh
 	{

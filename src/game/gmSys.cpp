@@ -1,10 +1,10 @@
 #include <glfw3.h>
-#include "renderer.h"
-#include "gui.h"
-#include "camera.h"
-#include "frameBuffer.h"
-#include "gbuffer.h"
-#include "postprc.h"
+#include "ogCat/renderer.h"
+#include "ogCat/gui.h"
+#include "ogCat/camera.h"
+#include "ogCat/frameBuffer.h"
+#include "ogCat/gbuffer.h"
+#include "ogCat/postprc.h"
 #include "gmSys.h"
 #include <iostream>
 #include <chrono>
@@ -108,7 +108,7 @@ void ogm::gmSys::refresh()
 	_lockCursor();
 }
 
-const glm::vec3& ogm::gmSys::get_eye() const
+glm::vec3 ogm::gmSys::get_eye() const
 {
 	if (_cam) {
 		return _cam->getEye();
@@ -116,7 +116,7 @@ const glm::vec3& ogm::gmSys::get_eye() const
 	return glm::vec3();
 }
 
-const glm::vec3& ogm::gmSys::get_at() const
+glm::vec3 ogm::gmSys::get_at() const
 {
 	if (_cam) {
 		return _cam->getAt();

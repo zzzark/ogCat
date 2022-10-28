@@ -35,7 +35,7 @@ namespace cat {
 
 		void load(const char* binFile, R3DBones& bones);
 		void update(R3DAnimation& ani, unsigned int tm, const glm::mat4& m);
-		virtual ~dynamic_mesh();
+		~dynamic_mesh() override;
 
 		void loop();
 		void pause();

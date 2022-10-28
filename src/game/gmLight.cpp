@@ -1,16 +1,16 @@
 #include <cmath>
-#include "../game/gmLight.h"
-#include "../ogCat/mesh_instance.h"
-#include "../ogCat/shadowBuffer.h"
-#include "../ogCat/shadowMapCUBE.h"
-#include "../ogCat/shadowMap2D.h"
+#include "gmLight.h"
+#include "ogCat/mesh_instance.h"
+#include "ogCat/shadowBuffer.h"
+#include "ogCat/shadowMapCUBE.h"
+#include "ogCat/shadowMap2D.h"
 
 void ogm::gmLight::defaultLightFunction(float& r, float& g, float& b, float& intensity, float& ar, float& ag, float& ab, float& maxval)
  {
 	if (r < 0) r = 0;
 	if (g < 0) g = 0;
 	if (b < 0) b = 0;
-	float len = sqrt(r * r + g * g + b * b);
+	float len = std::sqrt(r * r + g * g + b * b);
 	intensity = len / 1.73205f;
 	r /= len;
 	g /= len;
@@ -23,6 +23,8 @@ void ogm::gmLight::defaultLightFunction(float& r, float& g, float& b, float& int
 	if (ab > 0.707106f) ab = 0.707106f;
 	maxval = intensity * 2.71828f;
 }
+
+ogm::gmLight::~gmLight() = default;
 
 // ===================================================================================================== //
 

@@ -4,7 +4,7 @@
 */
 
 #pragma once
-#include "../game/gmRenderer.h"
+#include "gmRenderer.h"
 #include <memory>
 
 namespace cat

@@ -1,4 +1,4 @@
-#include "../game/gmSys.h"
+#include "game/gmSys.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 static const unsigned int action_release = 0;

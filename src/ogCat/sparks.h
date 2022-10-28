@@ -24,7 +24,7 @@ namespace spark_effect
 		void  setIntensity(float val) const;
 		void  setSize(float val) const;
 		void  setRate(float val);
-		virtual void render(const cat::gbuffer& gbuf, const unsigned int timeDelta, const cat::camera& cam) = 0 {};
+		virtual void render(const cat::gbuffer& gbuf, const unsigned int timeDelta, const cat::camera& cam) = 0;
 		virtual ~sparks() {}
 	};
 }

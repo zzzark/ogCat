@@ -1,6 +1,6 @@
 #pragma once
 #include "gmObject.h"
-#include "../game/gmRenderer.h"
+#include "gmRenderer.h"
 
 namespace cat
 {

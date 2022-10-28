@@ -6,6 +6,7 @@
 #include <memory>
 #include "gmSys.h"
 #include "glm/glm.hpp"
+
 namespace cat
 {
 	namespace spark_effect

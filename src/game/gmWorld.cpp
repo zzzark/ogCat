@@ -1,6 +1,6 @@
 #include "gmWorld.h"
-#include "../ogCat/skybox.h"
-#include "../ogCat/terrain.h"
+#include "ogCat/skybox.h"
+#include "ogCat/terrain.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 

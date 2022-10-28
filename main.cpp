@@ -16,7 +16,7 @@ ogm::gmSurface g_gmsuf;
 
 int main()
 {
-	g_gmsys.initialize(1200, 800, "2019151030 郑瑞坤");
+	g_gmsys.initialize(1200, 800, "2019151030 zrk");
 	g_gmsys.setCurposCallback(ctrl_cursor);
 	g_gmsys.setKeybrdCallback(ctrl_key);
 	g_gmsys.setScrollCallback(ctrl_scroll);

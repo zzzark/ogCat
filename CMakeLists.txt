@@ -28,6 +28,7 @@ message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # --------------------- LINK --------------------- #
 add_executable(MyGL ${MyGLSrc})
+# target_link_libraries(MyGL "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glfw/lib/mingw/libglfw3.a")
+target_link_libraries(MyGL "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glfw/lib/vs2019/glfw3.lib")
+target_link_libraries(MyGL "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glew/lib/glew32s.lib")
 target_link_libraries(MyGL opengl32)
-target_link_libraries(MyGL "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glew/lib/glew32.lib")
-target_link_libraries(MyGL "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glfw/lib/libglfw3dll.a")
